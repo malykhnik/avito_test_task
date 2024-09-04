@@ -23,3 +23,16 @@ task1-5447.avito2024.codenrock.com
 
 Состояние namespace, работающие pods и логи приложений можно посмотреть по адресу [https://dashboard.avito2024.codenrock.com/](https://dashboard.avito2024.codenrock.com/). Для открытия дашборда необходимо выбрать авторизацию через Kubeconfig и указать путь до выданного вам `*.kube.config` файла
 
+### База данных
+На каждую команду созданы базы данных Postgres. Доступы (login, password и db_name) одинаковые для обеих БД и выдаются на каждую команду организатором.
+
+Для подключения к Postgres используйте следующую команду:
+```
+psql "host=rc1b-mnv3wurin2k2p97u.mdb.yandexcloud.net \
+      port=6432 \
+      sslmode=verify-full \
+      dbname=$DB_NAME \
+      user=$DB_USERNAME \
+      target_session_attrs=read-write"
+```
+`rc1b-mnv3wurin2k2p97u.mdb.yandexcloud.net` - адрес хоста в кластере Yandex.Cloud. Подробнее в [документации](https://cloud.yandex.ru/docs/managed-postgresql/). Не забудьте скачать и установить [SSL сертификат](https://cloud.yandex.ru/docs/managed-postgresql/operations/connect#get-ssl-cert). При необходимости, подключаться можно и без SSL
