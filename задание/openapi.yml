@@ -29,6 +29,12 @@ paths:
               schema:
                 type: string
                 example: ok
+        "400":
+          description: Неверный формат запроса или его параметры.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
         "500":
           description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
@@ -73,6 +79,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /tenders/new:
     post:
@@ -115,12 +123,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tender"
+        "400":
+          description: Неверный формат запроса или его параметры.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
         "401":
           description: Пользователь не существует или некорректен.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /tenders/my:
     get:
@@ -148,12 +164,20 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/tender"
+        "400":
+          description: Неверный формат запроса или его параметры.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
         "401":
           description: Пользователь не существует или некорректен.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /tenders/{tenderId}/status:
     get:
@@ -179,12 +203,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/tenderStatus"
+        "400":
+          description: Неверный формат запроса или его параметры.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
         "401":
           description: Пользователь не существует или некорректен.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
     put:
       summary: Изменение статуса тендера
       description: Изменить статус тендера по его идентификатору.
@@ -238,6 +270,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /tenders/{tenderId}/edit:
     patch:
@@ -293,6 +327,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /tenders/{tenderId}/rollback/{version}:
     put:
@@ -351,6 +387,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /bids/new:
     post:
@@ -393,12 +431,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/bid"
+        "400":
+          description: Неверный формат запроса или его параметры.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
         "401":
           description: Пользователь не существует или некорректен.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /bids/my:
     get:
@@ -426,12 +472,20 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/bid"
+        "400":
+          description: Неверный формат запроса или его параметры.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
         "401":
           description: Пользователь не существует или некорректен.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /bids/{tenderId}/list:
     get:
@@ -486,6 +540,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /bids/{bidId}/status:
     get:
@@ -512,12 +568,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/bidStatus"
+        "400":
+          description: Неверный формат запроса или его параметры.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
         "401":
           description: Пользователь не существует или некорректен.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
     put:
       summary: Изменение статуса предложения
       description: Изменить статус предложения по его уникальному идентификатору.
@@ -571,6 +635,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /bids/{bidId}/edit:
     patch:
@@ -624,6 +690,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /bids/{bidId}/submit_decision:
     put:
@@ -679,6 +747,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /bids/{bidId}/feedback:
     put:
@@ -734,6 +804,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /bids/{bidId}/rollback/{version}:
     put:
@@ -792,6 +864,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
   /bids/{tenderId}/reviews:
     get:
@@ -853,6 +927,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
+        "500":
+          description: Сервер не готов обрабатывать запросы, если ответ статусом 500 или любой другой, кроме 200.
 
 components:
   schemas:
