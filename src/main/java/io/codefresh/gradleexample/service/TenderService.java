@@ -14,7 +14,7 @@ public interface TenderService {
 
     TenderResponseDto saveTender(TenderRequestDto tenderRequestDto);
 
-    boolean isUserResponsibleForOrganization(String username, UUID id);
+//    boolean isUserResponsibleForOrganization(String username, UUID id);
 
     List<TenderResponseDto> getTendersByUser(String username);
     Tender getTenderById(UUID id);

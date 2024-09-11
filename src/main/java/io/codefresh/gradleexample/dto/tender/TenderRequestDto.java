@@ -1,5 +1,6 @@
 package io.codefresh.gradleexample.dto.tender;
 
+import io.codefresh.gradleexample.enumerate.ServiceType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class TenderRequestDto {
     @NotNull(message = "description can not be null")
     private String description;
     @NotNull(message = "serviceType can not be null")
-    private String serviceType;
+    private ServiceType serviceType;
     @NotNull(message = "organizationId can not be null")
     private UUID organizationId;
     @NotNull(message = "creatorUsername can not be null")

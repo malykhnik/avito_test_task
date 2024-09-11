@@ -1,5 +1,6 @@
 package io.codefresh.gradleexample.entity;
 
+import io.codefresh.gradleexample.enumerate.OrganizationType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

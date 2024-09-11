@@ -2,6 +2,7 @@ package io.codefresh.gradleexample.mapper;
 
 import io.codefresh.gradleexample.dto.tender.TenderResponseDto;
 import io.codefresh.gradleexample.entity.Tender;
+import io.codefresh.gradleexample.enumerate.Status;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ public class TenderMapper {
                 .id(tender.getId())
                 .name(tender.getName())
                 .description(tender.getDescription())
-                .status(tender.getStatus())
+                .status(Status.valueOf(tender.getStatus()))
                 .serviceType(tender.getServiceType())
                 .version(tender.getVersion())
                 .createdAt(tender.getCreatedAt())

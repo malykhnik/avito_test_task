@@ -1,5 +1,7 @@
 package io.codefresh.gradleexample.entity;
 
+import io.codefresh.gradleexample.enumerate.AuthorType;
+import io.codefresh.gradleexample.enumerate.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,8 +29,13 @@ public class Bid {
     @Column(name = "description")
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private Status status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "author_type")
+    private AuthorType authorType;
 
     @ManyToOne
     @JoinColumn(name = "tender_id")

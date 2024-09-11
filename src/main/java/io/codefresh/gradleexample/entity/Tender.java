@@ -1,6 +1,7 @@
 package io.codefresh.gradleexample.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.codefresh.gradleexample.enumerate.ServiceType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,8 +32,9 @@ public class Tender {
     @Column(name = "description")
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "service_type")
-    private String serviceType;
+    private ServiceType serviceType;
 
     @Column(name = "status")
     @JsonIgnore

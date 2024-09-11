@@ -9,6 +9,7 @@ import io.codefresh.gradleexample.exception.NotFoundUserRightsException;
 import io.codefresh.gradleexample.exception.TenderNotFoundException;
 import io.codefresh.gradleexample.exception.UserNotFoundException;
 import io.codefresh.gradleexample.service.TenderService;
+import io.codefresh.gradleexample.utils.Helper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TenderController {
     private final TenderService tenderService;
+    private final Helper helper;
 
     @GetMapping()
     public ResponseEntity<List<TenderResponseDto>> getTenders() {
@@ -33,7 +35,7 @@ public class TenderController {
     @PostMapping("/new")
     public ResponseEntity<?> createTender(@Valid @RequestBody TenderRequestDto tenderRequestDto) {
         try {
-            if (!tenderService.isUserResponsibleForOrganization(tenderRequestDto.getCreatorUsername(), tenderRequestDto.getOrganizationId())) {
+            if (!helper.isUserResponsibleForOrganization(tenderRequestDto.getCreatorUsername(), tenderRequestDto.getOrganizationId())) {
                 return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
             }
         } catch (UserNotFoundException e) {

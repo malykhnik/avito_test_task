@@ -1,5 +1,7 @@
 package io.codefresh.gradleexample.dto.tender;
 
+import io.codefresh.gradleexample.enumerate.ServiceType;
+import io.codefresh.gradleexample.enumerate.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,9 +21,9 @@ public class TenderResponseDto {
 
     private String description;
 
-    private String status;
+    private Status status;
 
-    private String serviceType;
+    private ServiceType serviceType;
 
     private Long version;
 
