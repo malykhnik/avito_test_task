@@ -5,13 +5,12 @@ import io.codefresh.gradleexample.dto.tender.TenderEditDto;
 import io.codefresh.gradleexample.dto.tender.TenderRequestDto;
 import io.codefresh.gradleexample.dto.tender.TenderResponseDto;
 import io.codefresh.gradleexample.entity.Tender;
-import io.codefresh.gradleexample.exception.NotFoundUserRights;
-import io.codefresh.gradleexample.exception.TenderNotFound;
+import io.codefresh.gradleexample.exception.NotFoundUserRightsException;
+import io.codefresh.gradleexample.exception.TenderNotFoundException;
 import io.codefresh.gradleexample.exception.UserNotFoundException;
 import io.codefresh.gradleexample.service.TenderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +54,6 @@ public class TenderController {
         }
     }
 
-    // параметр необязательный проверить(required)!!!!!!!!!!!!!!!
     @GetMapping("/{tenderId}/status")
     public ResponseEntity<?> getCurrentStatus(@PathVariable UUID tenderId,
                                               @RequestParam(required = false) String username) {
@@ -70,40 +68,37 @@ public class TenderController {
             return ResponseEntity.ok(tender.getStatus());
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
-        } catch (NotFoundUserRights e) {
+        } catch (NotFoundUserRightsException e) {
             return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
-        } catch (TenderNotFound e) {
+        } catch (TenderNotFoundException e) {
             return ResponseEntity.status(404).body(ErrorDto.builder().reason("Tender not found"));
         }
     }
 
     @PutMapping("/{tenderId}/status")
     public ResponseEntity<?> editStatusTender(@PathVariable UUID tenderId,
-                                        @RequestParam String status,
-                                        @RequestParam String username) {
-        if (tenderId == null || status.isEmpty() || username.isEmpty()) {
-            return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));
+                                              @RequestParam String status,
+                                              @RequestParam String username) {
+        if (tenderId == null || status == null || status.isEmpty() || username == null || username.isEmpty()) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parameter is empty"));
         }
         try {
             Tender tender = tenderService.getTenderByIdAndUsername(tenderId, username);
             return ResponseEntity.ok(tenderService.changeStatusOfTender(tender, status));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
-        } catch (NotFoundUserRights e) {
+        } catch (NotFoundUserRightsException e) {
             return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
-        } catch (TenderNotFound e) {
+        } catch (TenderNotFoundException e) {
             return ResponseEntity.status(404).body(ErrorDto.builder().reason("Tender not found"));
         }
     }
 
-
-    // ПРОВЕРИТЬ ЧТО БУДЕТ ЕСЛИ НИЧЕ НЕ ПЕРЕДАТЬ В ПАРАМЕТРЫ И В ТЕЛО
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    @PatchMapping("/{tenderId}/status")
+    @PatchMapping("/{tenderId}/edit")
     public ResponseEntity<?> editTender(@PathVariable UUID tenderId,
                                         @RequestParam String username,
                                         @RequestBody TenderEditDto tenderEditDto) {
-        if (tenderId == null || username.isEmpty()) {
+        if (tenderId == null || username == null || username.isEmpty()) {
             return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));
         }
         try {
@@ -111,13 +106,29 @@ public class TenderController {
             return ResponseEntity.ok(tenderService.updateTender(tender, tenderEditDto));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
-        } catch (NotFoundUserRights e) {
+        } catch (NotFoundUserRightsException e) {
             return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
-        } catch (TenderNotFound e) {
+        } catch (TenderNotFoundException e) {
             return ResponseEntity.status(404).body(ErrorDto.builder().reason("Tender not found"));
         }
     }
 
-
+    @PutMapping("/{tenderId}/rollback/{version}")
+    public ResponseEntity<?> rollbackTender(@PathVariable UUID tenderId,
+                                            @PathVariable Long version,
+                                            @RequestParam String username) {
+        if (username == null || username.isEmpty() || tenderId == null ) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));
+        }
+        try {
+            return ResponseEntity.ok(tenderService.rollbackToVersion(tenderId, username, version));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
+        } catch (NotFoundUserRightsException e) {
+            return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
+        } catch (TenderNotFoundException e) {
+            return ResponseEntity.status(404).body(ErrorDto.builder().reason("Tender not found"));
+        }
+    }
 
 }

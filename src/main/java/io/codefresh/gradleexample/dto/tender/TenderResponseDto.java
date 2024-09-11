@@ -23,7 +23,7 @@ public class TenderResponseDto {
 
     private String serviceType;
 
-    private String version;
+    private Long version;
 
     private LocalDateTime createdAt;
 }

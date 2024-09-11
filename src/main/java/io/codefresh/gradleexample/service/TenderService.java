@@ -19,6 +19,8 @@ public interface TenderService {
     List<TenderResponseDto> getTendersByUser(String username);
     Tender getTenderById(UUID id);
     Tender getTenderByIdAndUsername(UUID id, String username);
+    Tender getTenderByIdAndUsernameAndVersion(UUID id, String username, Long version);
     TenderResponseDto changeStatusOfTender(Tender tender, String status);
     TenderResponseDto updateTender(Tender tender, TenderEditDto tenderEditDto);
+    TenderResponseDto rollbackToVersion(UUID id, String username, Long version);
 }

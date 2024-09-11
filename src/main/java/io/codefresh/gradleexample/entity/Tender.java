@@ -40,7 +40,7 @@ public class Tender {
 
     @Column(name = "version", columnDefinition = "version default 1")
     @JsonIgnore
-    private String version;
+    private Long version;
 
     @ManyToOne
     @JoinColumn(name = "organization_id")

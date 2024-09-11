@@ -11,10 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class TenderEditDto {
-    @NotNull(message = "name can not be null")
     private String name;
-    @NotNull(message = "description can not be null")
     private String description;
-    @NotNull(message = "serviceType can not be null")
     private String serviceType;
 }

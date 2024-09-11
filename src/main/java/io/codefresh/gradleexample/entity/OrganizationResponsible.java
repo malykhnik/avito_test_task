@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.UUID;
 
@@ -22,9 +24,11 @@ public class OrganizationResponsible {
 
     @ManyToOne
     @JoinColumn(name = "organization_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Organization organization;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 }
