@@ -15,10 +15,11 @@ public class TenderMapper {
                 .description(tender.getDescription())
                 .status(tender.getStatus())
                 .serviceType(tender.getServiceType())
-                .organization_name(tender.getOrganization().getName())
-                .creator_name(tender.getCreator().getUsername())
+                .version(tender.getVersion())
+                .createdAt(tender.getCreatedAt())
                 .build();
     }
+
 
     public static List<TenderResponseDto> toDtoList(List<Tender> tenders) {
         return tenders.stream()

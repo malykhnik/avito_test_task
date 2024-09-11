@@ -1,5 +1,6 @@
 package io.codefresh.gradleexample.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,12 +27,20 @@ public class Tender {
 
     @Column(name = "name")
     private String name;
+
     @Column(name = "description")
     private String description;
+
     @Column(name = "service_type")
     private String serviceType;
+
     @Column(name = "status")
+    @JsonIgnore
     private String status;
+
+    @Column(name = "version", columnDefinition = "version default 1")
+    @JsonIgnore
+    private String version;
 
     @ManyToOne
     @JoinColumn(name = "organization_id")

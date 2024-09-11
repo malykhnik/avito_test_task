@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -18,11 +19,11 @@ public class TenderResponseDto {
 
     private String description;
 
-    private String serviceType;
-
     private String status;
 
-    private String organization_name;
+    private String serviceType;
 
-    private String creator_name;
+    private String version;
+
+    private LocalDateTime createdAt;
 }
