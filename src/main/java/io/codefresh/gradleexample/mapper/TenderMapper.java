@@ -14,7 +14,7 @@ public class TenderMapper {
                 .id(tender.getId())
                 .name(tender.getName())
                 .description(tender.getDescription())
-                .status(Status.valueOf(tender.getStatus()))
+                .status(Status.valueOf(String.valueOf(tender.getStatus())))
                 .serviceType(tender.getServiceType())
                 .version(tender.getVersion())
                 .createdAt(tender.getCreatedAt())

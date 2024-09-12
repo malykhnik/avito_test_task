@@ -2,6 +2,7 @@ package io.codefresh.gradleexample.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.codefresh.gradleexample.enumerate.ServiceType;
+import io.codefresh.gradleexample.enumerate.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +39,7 @@ public class Tender {
 
     @Column(name = "status")
     @JsonIgnore
-    private String status;
+    private Status status;
 
     @Column(name = "version", columnDefinition = "version default 1")
     @JsonIgnore

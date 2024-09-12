@@ -9,6 +9,7 @@ import io.codefresh.gradleexample.entity.Tender;
 import io.codefresh.gradleexample.entity.User;
 import io.codefresh.gradleexample.enumerate.Status;
 import io.codefresh.gradleexample.exception.NotFoundUserRightsException;
+import io.codefresh.gradleexample.exception.OrganizationNotFoundException;
 import io.codefresh.gradleexample.exception.TenderNotFoundException;
 import io.codefresh.gradleexample.exception.UserNotFoundException;
 import io.codefresh.gradleexample.mapper.TenderMapper;
@@ -45,7 +46,7 @@ public class TenderServiceImpl implements TenderService {
     @Override
     public TenderResponseDto saveTender(TenderRequestDto tenderRequestDto) {
         Optional<User> userOptional = userRepo.findByUsername(tenderRequestDto.getCreatorUsername());
-        Optional<Organization> organizationOptional = organizationRepo.findOrganizationById(tenderRequestDto.getOrganizationId());
+        Optional<Organization> organizationOptional = organizationRepo.findById(tenderRequestDto.getOrganizationId());
 
         User user;
         if (userOptional.isPresent()) {
@@ -54,33 +55,27 @@ public class TenderServiceImpl implements TenderService {
             throw new UserNotFoundException();
         }
 
+        Organization organization;
+        if (organizationOptional.isPresent()) {
+            organization = organizationOptional.get();
+        } else {
+            throw new OrganizationNotFoundException();
+        }
+
+
         return TenderMapper.toDto(tenderRepo.save(Tender.builder()
                 .id(UUID.randomUUID())
                 .name(tenderRequestDto.getName())
                 .description(tenderRequestDto.getDescription())
                 .serviceType(tenderRequestDto.getServiceType())
-                .status(String.valueOf(Status.Created))
+                .status(Status.valueOf(String.valueOf(Status.Created)))
                 .version(1L)
-                .organization(organizationOptional.get())
+                .organization(organization)
                 .creator(user)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build()));
     }
-//
-//    @Override
-//    public boolean isUserResponsibleForOrganization(String username, UUID organization_id) {
-//        Optional<User> userOptional = userRepo.findByUsername(username);
-//        Optional<Organization> organizationOptional = organizationRepo.findOrganizationById(organization_id);
-//        if (userOptional.isPresent() && organizationOptional.isPresent()) {
-//            User user = userOptional.get();
-//            Organization organization = organizationOptional.get();
-//            Optional<OrganizationResponsible> organizationResponsibleOptional =
-//                    responsibleRepo.findOrganizationResponsibleByOrganizationAndUser(organization, user);
-//            return organizationResponsibleOptional.isPresent();
-//        }
-//        throw new NotFoundUserRightsException();
-//    }
 
     @Override
     public List<TenderResponseDto> getTendersByUser(String username) {
@@ -102,10 +97,10 @@ public class TenderServiceImpl implements TenderService {
 
         if (tenderOptional.isPresent()) {
             tender = tenderOptional.get();
-            if (tender.getStatus().equals(String.valueOf(Status.Created)) || tender.getStatus().equals(String.valueOf(Status.Closed))) {
+            if (tender.getStatus().equals(Status.Created) || tender.getStatus().equals(Status.Closed)) {
                 throw new NotFoundUserRightsException();
             }
-            if (tender.getStatus().equals(String.valueOf(Status.Published))) {
+            if (tender.getStatus().equals(Status.Published)) {
                 return tender;
             }
             throw new NotFoundUserRightsException();
@@ -124,12 +119,11 @@ public class TenderServiceImpl implements TenderService {
             if (tenderOptional.isPresent()) {
                 tender = tenderOptional.get();
                 UUID organization_id = tender.getOrganization().getId();
-                if ((tender.getStatus().equals(String.valueOf(Status.Created)) || tender.getStatus().equals(String.valueOf(Status.Closed))) &&
+                if ((tender.getStatus().equals(Status.Created) || tender.getStatus().equals(Status.Closed)) &&
                         helper.isUserResponsibleForOrganization(username, organization_id)) {
-                    throw new NotFoundUserRightsException();
+                    return tender;
                 }
-                if (tender.getStatus().equals(String.valueOf(Status.Published))
-                        && helper.isUserResponsibleForOrganization(username, organization_id)) {
+                if (tender.getStatus().equals(Status.Published)) {
                     return tender;
                 }
                 throw new NotFoundUserRightsException();
@@ -140,7 +134,8 @@ public class TenderServiceImpl implements TenderService {
     }
 
     @Override
-    public TenderResponseDto changeStatusOfTender(Tender tender, String status) {
+    public TenderResponseDto changeStatusOfTender(Tender tender, Status status) {
+        //обработка исключений уже произошла в методе getTenderByIdAndUsername
         tender.setStatus(status);
         tenderRepo.save(tender);
         return TenderMapper.toDto(tender);
@@ -148,23 +143,37 @@ public class TenderServiceImpl implements TenderService {
 
     @Override
     public TenderResponseDto updateTender(Tender tender, TenderEditDto tenderEditDto) {
-        Tender tenderUpdate = Tender.builder()
-                .id(UUID.randomUUID())
-                .name(tender.getName())
-                .description(tender.getDescription())
-                .serviceType(tender.getServiceType())
-                .status(tender.getStatus())
-                .version(tender.getVersion() + 1)
-                .organization(tender.getOrganization())
-                .creator(tender.getCreator())
-                .createdAt(tender.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
-                .build();
-        if (!tenderEditDto.getName().isEmpty()) tenderUpdate.setName(tenderEditDto.getName());
-        if (!tenderEditDto.getDescription().isEmpty()) tenderUpdate.setDescription(tenderEditDto.getDescription());
-        if (!String.valueOf(tenderEditDto.getServiceType()).isEmpty()) tenderUpdate.setServiceType(tenderEditDto.getServiceType());
-        tenderRepo.save(tenderUpdate);
-        return TenderMapper.toDto(tenderUpdate);
+        Optional<User> userOptional = userRepo.findByUsername(tender.getCreator().getUsername());
+        if (userOptional.isPresent()) {
+            User user =  userOptional.get();
+            UUID organization_id = tender.getOrganization().getId();
+            if ((tender.getStatus().equals(Status.Created) || tender.getStatus().equals(Status.Closed)) &&
+                    helper.isUserResponsibleForOrganization(user.getUsername(), organization_id)) {
+                Tender tenderUpdate = Tender.builder()
+                        .id(UUID.randomUUID())
+                        .name(tender.getName())
+                        .description(tender.getDescription())
+                        .serviceType(tender.getServiceType())
+                        .status(tender.getStatus())
+                        .version(tender.getVersion() + 1)
+                        .organization(tender.getOrganization())
+                        .creator(tender.getCreator())
+                        .createdAt(tender.getCreatedAt())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
+                if (tenderEditDto.getName() != null && !tenderEditDto.getName().isEmpty())
+                    tenderUpdate.setName(tenderEditDto.getName());
+                if (tenderEditDto.getDescription() != null && !tenderEditDto.getDescription().isEmpty())
+                    tenderUpdate.setDescription(tenderEditDto.getDescription());
+                if (tenderEditDto.getServiceType() != null && !String.valueOf(tenderEditDto.getServiceType()).isEmpty())
+                    tenderUpdate.setServiceType(tenderEditDto.getServiceType());
+                tenderRepo.save(tenderUpdate);
+                return TenderMapper.toDto(tenderUpdate);
+            }
+            throw new NotFoundUserRightsException();
+        }
+        throw new UserNotFoundException();
+
     }
 
     @Override

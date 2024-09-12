@@ -5,7 +5,9 @@ import io.codefresh.gradleexample.dto.tender.TenderEditDto;
 import io.codefresh.gradleexample.dto.tender.TenderRequestDto;
 import io.codefresh.gradleexample.dto.tender.TenderResponseDto;
 import io.codefresh.gradleexample.entity.Tender;
+import io.codefresh.gradleexample.enumerate.Status;
 import io.codefresh.gradleexample.exception.NotFoundUserRightsException;
+import io.codefresh.gradleexample.exception.OrganizationNotFoundException;
 import io.codefresh.gradleexample.exception.TenderNotFoundException;
 import io.codefresh.gradleexample.exception.UserNotFoundException;
 import io.codefresh.gradleexample.service.TenderService;
@@ -40,6 +42,8 @@ public class TenderController {
             }
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
+        } catch (OrganizationNotFoundException e) {
+            return ResponseEntity.status(404).body(ErrorDto.builder().reason("Organization not found"));
         }
 
         return ResponseEntity.ok(tenderService.saveTender(tenderRequestDto));
@@ -79,9 +83,9 @@ public class TenderController {
 
     @PutMapping("/{tenderId}/status")
     public ResponseEntity<?> editStatusTender(@PathVariable UUID tenderId,
-                                              @RequestParam String status,
+                                              @RequestParam Status status,
                                               @RequestParam String username) {
-        if (tenderId == null || status == null || status.isEmpty() || username == null || username.isEmpty()) {
+        if (tenderId == null || status == null || username == null || username.isEmpty()) {
             return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parameter is empty"));
         }
         try {

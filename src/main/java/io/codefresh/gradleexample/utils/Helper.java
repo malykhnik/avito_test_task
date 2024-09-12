@@ -21,7 +21,7 @@ public class Helper {
     private final OrganizationRepository organizationRepo;
     public boolean isUserResponsibleForOrganization(String username, UUID organization_id) {
         Optional<User> userOptional = userRepo.findByUsername(username);
-        Optional<Organization> organizationOptional = organizationRepo.findOrganizationById(organization_id);
+        Optional<Organization> organizationOptional = organizationRepo.findById(organization_id);
         if (userOptional.isPresent() && organizationOptional.isPresent()) {
             User user = userOptional.get();
             Organization organization = organizationOptional.get();

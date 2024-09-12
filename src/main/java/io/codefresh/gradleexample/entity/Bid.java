@@ -1,9 +1,11 @@
 package io.codefresh.gradleexample.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.codefresh.gradleexample.enumerate.AuthorType;
 import io.codefresh.gradleexample.enumerate.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,6 +19,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Bid {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -36,6 +39,10 @@ public class Bid {
     @Enumerated(EnumType.STRING)
     @Column(name = "author_type")
     private AuthorType authorType;
+
+    @Column(name = "version", columnDefinition = "version default 1")
+    @JsonIgnore
+    private Long version;
 
     @ManyToOne
     @JoinColumn(name = "tender_id")
