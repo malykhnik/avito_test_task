@@ -7,5 +7,4 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface OrganizationRepository extends JpaRepository<Organization, UUID> {
-    Optional<Organization> findById(UUID id);
 }

@@ -6,9 +6,11 @@ import io.codefresh.gradleexample.dto.bid.BidRequestDto;
 import io.codefresh.gradleexample.dto.bid.BidResponseDto;
 import io.codefresh.gradleexample.entity.Bid;
 import io.codefresh.gradleexample.entity.Tender;
+import io.codefresh.gradleexample.enumerate.BidDecision;
 import io.codefresh.gradleexample.enumerate.Status;
 import io.codefresh.gradleexample.exception.*;
 import io.codefresh.gradleexample.service.BidService;
+import io.codefresh.gradleexample.service.DecisionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BidController {
     private final BidService bidService;
+    private final DecisionService decisionService;
 
     @PostMapping("/new")
     public ResponseEntity<?> createBid(@Valid @RequestBody BidRequestDto bidRequestDto) {
@@ -82,8 +85,8 @@ public class BidController {
 
     @PutMapping("/{bidId}/status")
     public ResponseEntity<?> updateBidStatusById(@PathVariable UUID bidId,
-                                              @RequestParam Status status,
-                                              @RequestParam String username) {
+                                                 @RequestParam Status status,
+                                                 @RequestParam String username) {
         if (bidId == null || status == null || username == null || username.isEmpty()) {
             return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parameter is empty"));
         }
@@ -117,5 +120,23 @@ public class BidController {
         }
     }
 
-
+    @PutMapping("/{bidId}/submit_decision")
+    public ResponseEntity<?> submitDecision(@PathVariable UUID bidId,
+                                            @RequestParam BidDecision bidDecision,
+                                            @RequestParam String username) {
+        if (bidId == null || username == null || username.isEmpty() || bidDecision == null) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));
+        }
+        try {
+            return ResponseEntity.ok(decisionService.submitDecision(bidId, bidDecision, username));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
+        } catch (NotFoundUserRightsException e) {
+            return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
+        } catch (TenderNotFoundException e) {
+            return ResponseEntity.status(404).body(ErrorDto.builder().reason("Bid not found"));
+        } catch (OrganizationNotFoundException e) {
+            return ResponseEntity.status(404).body(ErrorDto.builder().reason("Organization not found"));
+        }
+    }
 }

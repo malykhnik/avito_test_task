@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Repository
 public interface TenderRepository extends JpaRepository<Tender, UUID> {
-    Optional<List<Tender>> findTendersByCreator(User user);
-    Optional<Tender> findTenderByIdAndCreator(UUID id, User user);
-    Optional<Tender> findTenderByIdAndCreatorAndVersion(UUID id, User user, Long version);
+    Optional<List<Tender>> findTendersByCreator(User creator);
+    Optional<Tender> findTenderByIdAndCreator(UUID id, User creator);
+    Optional<Tender> findTenderByIdAndCreatorAndVersion(UUID id, User creator, Long version);
 }
