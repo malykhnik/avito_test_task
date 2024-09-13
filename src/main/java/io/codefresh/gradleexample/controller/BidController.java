@@ -178,5 +178,24 @@ public class BidController {
         }
     }
 
-
+    @GetMapping("/{tenderId}/reviews")
+    public ResponseEntity<?> getReviews(@PathVariable UUID tenderId,
+                                        @RequestParam String authorUsername,
+                                        @RequestParam String requesterUsername ) {
+        if (tenderId == null || authorUsername == null || authorUsername.isEmpty()
+                || requesterUsername == null || requesterUsername.isEmpty()) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));
+        }
+        try {
+            return ResponseEntity.ok(bidService.getAllReviews(tenderId, authorUsername, requesterUsername));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
+        } catch (NotFoundUserRightsException e) {
+            return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
+        } catch (TenderNotFoundException | FeedbackNotFoundException e) {
+            return ResponseEntity.status(404).body(ErrorDto.builder().reason("Tender or feedbacks not found"));
+        } catch (BidNotFoundException e) {
+            return ResponseEntity.status(404).body(ErrorDto.builder().reason("Bid not found"));
+        }
+    }
 }

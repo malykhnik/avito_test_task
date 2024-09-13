@@ -1,5 +1,6 @@
 package io.codefresh.gradleexample.repository;
 
+import io.codefresh.gradleexample.entity.Bid;
 import io.codefresh.gradleexample.entity.Tender;
 import io.codefresh.gradleexample.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

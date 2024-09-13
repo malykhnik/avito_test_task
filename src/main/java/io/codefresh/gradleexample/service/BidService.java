@@ -1,5 +1,6 @@
 package io.codefresh.gradleexample.service;
 
+import io.codefresh.gradleexample.dto.FeedbackResponseDto;
 import io.codefresh.gradleexample.dto.bid.BidEditDto;
 import io.codefresh.gradleexample.dto.bid.BidRequestDto;
 import io.codefresh.gradleexample.dto.bid.BidResponseDto;
@@ -22,4 +23,5 @@ public interface BidService {
     BidResponseDto editBid(Bid bid, BidEditDto bidEditDto);
     BidResponseDto rollbackVersion(UUID bidId, Long version, String username);
     Bid getBidByIdAndUsernameAndVersion(UUID id, String username, Long version);
+    List<FeedbackResponseDto> getAllReviews(UUID tenderId, String authorUsername, String requesterUsername);
 }

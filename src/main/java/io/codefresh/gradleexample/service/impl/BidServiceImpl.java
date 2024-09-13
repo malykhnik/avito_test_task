@@ -1,20 +1,16 @@
 package io.codefresh.gradleexample.service.impl;
 
+import io.codefresh.gradleexample.dto.FeedbackResponseDto;
 import io.codefresh.gradleexample.dto.bid.BidEditDto;
 import io.codefresh.gradleexample.dto.bid.BidRequestDto;
 import io.codefresh.gradleexample.dto.bid.BidResponseDto;
-import io.codefresh.gradleexample.entity.Bid;
-import io.codefresh.gradleexample.entity.Organization;
-import io.codefresh.gradleexample.entity.Tender;
-import io.codefresh.gradleexample.entity.User;
+import io.codefresh.gradleexample.entity.*;
 import io.codefresh.gradleexample.enumerate.Status;
 import io.codefresh.gradleexample.exception.*;
 import io.codefresh.gradleexample.mapper.BidMapper;
+import io.codefresh.gradleexample.mapper.FeedbackMapper;
 import io.codefresh.gradleexample.mapper.TenderMapper;
-import io.codefresh.gradleexample.repository.BidRepository;
-import io.codefresh.gradleexample.repository.OrganizationRepository;
-import io.codefresh.gradleexample.repository.TenderRepository;
-import io.codefresh.gradleexample.repository.UserRepository;
+import io.codefresh.gradleexample.repository.*;
 import io.codefresh.gradleexample.service.BidService;
 import io.codefresh.gradleexample.utils.Helper;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +30,7 @@ public class BidServiceImpl implements BidService {
     private final UserRepository userRepo;
     private final TenderRepository tenderRepo;
     private final OrganizationRepository organizationRepo;
+    private final FeedbackRepository feedbackRepo;
     private final Helper helper;
 
     @Override
@@ -245,5 +242,34 @@ public class BidServiceImpl implements BidService {
         bidRepo.save(bid);
 
         return BidMapper.toDto(bid);
+    }
+
+    @Override
+    public List<FeedbackResponseDto> getAllReviews(UUID tenderId, String authorUsername, String requesterUsername) {
+        Optional<User> userOptional = userRepo.findByUsername(requesterUsername);
+        if (userOptional.isPresent()) {
+            User requesterUser = userOptional.get();
+            Optional<Tender> tenderOptional = tenderRepo.findTenderByIdAndCreator(tenderId, requesterUser);
+            if (tenderOptional.isPresent()) {
+                Tender tender = tenderOptional.get();
+                Optional<User> authorOptional = userRepo.findByUsername(authorUsername);
+                if (authorOptional.isPresent()) {
+                    User authorUser = userOptional.get();
+                    Optional<List<Bid>> bidOptional = bidRepo.findBidsByTenderAndCreator(tender, authorUser);
+                    if (bidOptional.isPresent()) {
+                        Optional<List<Feedback>> feedbackListOptional = feedbackRepo.findByUser(authorUser);
+                        if (feedbackListOptional.isPresent()) {
+                            List<Feedback> feedbackList = feedbackListOptional.get();
+                            return FeedbackMapper.toDtoList(feedbackList);
+                        }
+                        throw new FeedbackNotFoundException();
+                    }
+                    throw new BidNotFoundException();
+                }
+                throw new UserNotFoundException();
+            }
+            throw new TenderNotFoundException();
+        }
+        throw new UserNotFoundException();
     }
 }
