@@ -11,5 +11,5 @@ import java.util.UUID;
 
 public interface OrganizationResponsibleRepository extends JpaRepository<OrganizationResponsible, UUID> {
     Optional<OrganizationResponsible> findOrganizationResponsibleByOrganizationAndUser(Organization organization, User user);
-    List<OrganizationResponsible> findOrganizationResponsiblesByOrganization(UUID organization);
+    List<OrganizationResponsible> findOrganizationResponsiblesByOrganization(Organization organization);
 }

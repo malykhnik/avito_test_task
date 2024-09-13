@@ -40,7 +40,7 @@ public class Bid {
     @Column(name = "author_type")
     private AuthorType authorType;
 
-    @Column(name = "version", columnDefinition = "version default 1")
+    @Column(name = "version", nullable = false)
     @JsonIgnore
     private Long version;
 
@@ -63,4 +63,11 @@ public class Bid {
     @UpdateTimestamp
     @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (version == null) {
+            version = 1L;
+        }
+    }
 }

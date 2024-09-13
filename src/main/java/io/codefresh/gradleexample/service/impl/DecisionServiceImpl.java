@@ -58,8 +58,7 @@ public class DecisionServiceImpl implements DecisionService {
     private BidResponseDto checkCountDecisionsOfBid(Bid bid) {
         List<Decision> decisionList = decisionRepo.findAllById(Collections.singleton(bid.getId()));
 
-        UUID organization_id = bid.getOrganization().getId();
-        List<OrganizationResponsible> responsible = responsibleRepo.findOrganizationResponsiblesByOrganization(organization_id);
+        List<OrganizationResponsible> responsible = responsibleRepo.findOrganizationResponsiblesByOrganization(bid.getOrganization());
 
         int quorum = Math.min(3, responsible.size());
         boolean isReject = decisionList.stream().anyMatch(decision -> decision.getDecision() == BidDecision.Rejected);

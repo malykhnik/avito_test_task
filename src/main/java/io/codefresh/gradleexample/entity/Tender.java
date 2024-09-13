@@ -41,7 +41,7 @@ public class Tender {
     @JsonIgnore
     private Status status;
 
-    @Column(name = "version", columnDefinition = "version default 1")
+    @Column(name = "version", nullable = false)
     @JsonIgnore
     private Long version;
 
@@ -60,4 +60,11 @@ public class Tender {
     @UpdateTimestamp
     @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (version == null) {
+            version = 1L;
+        }
+    }
 }

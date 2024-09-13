@@ -43,8 +43,10 @@ public class BidController {
         }
     }
 
-    @GetMapping("/my/{username}")
-    public ResponseEntity<?> getBidByUsername(@PathVariable String username) {
+    @GetMapping("/my")
+    public ResponseEntity<?> getBidByUsername(@RequestParam(defaultValue = "5",required = false) int limit,
+                                              @RequestParam(defaultValue = "0",required = false) int offset,
+                                              @RequestParam String username) {
         if (username == null || username.isEmpty()) return ResponseEntity.status(400).body(null);
         try {
             List<BidResponseDto> bidResponseDtos = bidService.getBidsByUser(username);
@@ -56,7 +58,9 @@ public class BidController {
 
     @GetMapping("/{tenderId}/list")
     public ResponseEntity<?> getBidsByTender(@PathVariable UUID tenderId,
-                                             @RequestParam String username) {
+                                             @RequestParam String username,
+                                             @RequestParam(defaultValue = "5",required = false) int limit,
+                                             @RequestParam(defaultValue = "0",required = false) int offset) {
         if (username == null || username.isEmpty() || tenderId == null) return ResponseEntity.status(400).body(null);
         try {
             return ResponseEntity.ok(bidService.getBidsByTender(tenderId, username));
@@ -181,7 +185,9 @@ public class BidController {
     @GetMapping("/{tenderId}/reviews")
     public ResponseEntity<?> getReviews(@PathVariable UUID tenderId,
                                         @RequestParam String authorUsername,
-                                        @RequestParam String requesterUsername ) {
+                                        @RequestParam String requesterUsername,
+                                        @RequestParam(defaultValue = "5",required = false) int limit,
+                                        @RequestParam(defaultValue = "0",required = false) int offset) {
         if (tenderId == null || authorUsername == null || authorUsername.isEmpty()
                 || requesterUsername == null || requesterUsername.isEmpty()) {
             return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));

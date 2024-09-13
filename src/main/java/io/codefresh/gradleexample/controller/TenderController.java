@@ -28,7 +28,13 @@ public class TenderController {
     private final Helper helper;
 
     @GetMapping()
-    public ResponseEntity<List<TenderResponseDto>> getTenders() {
+    public ResponseEntity<?> getTenders(@RequestParam(defaultValue = "5",required = false) int limit,
+                                        @RequestParam(defaultValue = "0",required = false) int offset,
+                                        @RequestParam(required = false) List<String> service_type) {
+        if (limit <= 0 || offset < 0) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("limit or offset less then 0"));
+        }
+
         return ResponseEntity.ok(tenderService.getTenders());
 
         // ДОБАВИТЬ ОБРАБОТКУ НЕВЕРНОГО ФОРМАТА ЗАПРОСА
@@ -49,8 +55,10 @@ public class TenderController {
         return ResponseEntity.ok(tenderService.saveTender(tenderRequestDto));
     }
 
-    @GetMapping("/my/{username}")
-    public ResponseEntity<?> getTenderNyUsername(@PathVariable String username) {
+    @GetMapping("/my")
+    public ResponseEntity<?> getTenderNyUsername(@RequestParam(defaultValue = "5",required = false) int limit,
+                                                 @RequestParam(defaultValue = "0",required = false) int offset,
+                                                 @RequestParam String username) {
         if (username == null || username.isEmpty()) return ResponseEntity.status(400).body(null);
         try {
             List<TenderResponseDto> tenderResponseDtos = tenderService.getTendersByUser(username);
@@ -123,7 +131,7 @@ public class TenderController {
     public ResponseEntity<?> rollbackTender(@PathVariable UUID tenderId,
                                             @PathVariable Long version,
                                             @RequestParam String username) {
-        if (username == null || username.isEmpty() || tenderId == null ) {
+        if (username == null || username.isEmpty() || tenderId == null) {
             return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));
         }
         try {
