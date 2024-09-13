@@ -14,9 +14,11 @@ import io.codefresh.gradleexample.service.TenderService;
 import io.codefresh.gradleexample.utils.Helper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,16 +30,21 @@ public class TenderController {
     private final Helper helper;
 
     @GetMapping()
-    public ResponseEntity<?> getTenders(@RequestParam(defaultValue = "5",required = false) int limit,
-                                        @RequestParam(defaultValue = "0",required = false) int offset,
+    public ResponseEntity<?> getTenders(@RequestParam(defaultValue = "5", required = false) int limit,
+                                        @RequestParam(defaultValue = "0", required = false) int offset,
                                         @RequestParam(required = false) List<String> service_type) {
         if (limit <= 0 || offset < 0) {
             return ResponseEntity.status(400).body(ErrorDto.builder().reason("limit or offset less then 0"));
         }
 
-        return ResponseEntity.ok(tenderService.getTenders());
+        List<String> serviceTypes;
+        if (service_type == null) serviceTypes = new ArrayList<>();
+        else serviceTypes = service_type;
 
-        // ДОБАВИТЬ ОБРАБОТКУ НЕВЕРНОГО ФОРМАТА ЗАПРОСА
+        Page<TenderResponseDto> tenders = tenderService.getTenders(serviceTypes, limit, offset);
+
+        return ResponseEntity.ok(tenders.getContent());
+
     }
 
     @PostMapping("/new")
@@ -56,13 +63,15 @@ public class TenderController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<?> getTenderNyUsername(@RequestParam(defaultValue = "5",required = false) int limit,
-                                                 @RequestParam(defaultValue = "0",required = false) int offset,
+    public ResponseEntity<?> getTenderNyUsername(@RequestParam(defaultValue = "5", required = false) int limit,
+                                                 @RequestParam(defaultValue = "0", required = false) int offset,
                                                  @RequestParam String username) {
         if (username == null || username.isEmpty()) return ResponseEntity.status(400).body(null);
+        if (limit <= 0 || offset < 0) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("limit or offset less then 0"));
+        }
         try {
-            List<TenderResponseDto> tenderResponseDtos = tenderService.getTendersByUser(username);
-            return ResponseEntity.ok(tenderResponseDtos);
+            return ResponseEntity.ok(tenderService.getTendersByUser(username, limit, offset));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
         }

@@ -20,6 +20,10 @@ import io.codefresh.gradleexample.repository.UserRepository;
 import io.codefresh.gradleexample.service.TenderService;
 import io.codefresh.gradleexample.utils.Helper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,9 +42,21 @@ public class TenderServiceImpl implements TenderService {
     private final Helper helper;
 
     @Override
-    public List<TenderResponseDto> getTenders() {
-        List<Tender> tenders = tenderRepo.findAll();
-        return TenderMapper.toDtoList(tenders);
+    public Page<TenderResponseDto> getTenders(List<String> serviceTypes, int limit, int offset) {
+        Pageable pageable = PageRequest.of(offset, limit, Sort.by("name").ascending());
+        if (serviceTypes == null || serviceTypes.isEmpty()) serviceTypes = null;
+
+        Page<Tender> tenders = tenderRepo.findAllByServiceType(serviceTypes, pageable);
+
+        return tenders.map(tender -> new TenderResponseDto(
+                tender.getId(),
+                tender.getName(),
+                tender.getDescription(),
+                tender.getStatus(),
+                tender.getServiceType(),
+                tender.getVersion(),
+                tender.getCreatedAt()
+        ));
     }
 
     @Override
@@ -78,11 +94,13 @@ public class TenderServiceImpl implements TenderService {
     }
 
     @Override
-    public List<TenderResponseDto> getTendersByUser(String username) {
+    public List<TenderResponseDto> getTendersByUser(String username,  int limit, int offset) {
+        Pageable pageable = PageRequest.of(offset, limit, Sort.by("name").ascending());
+
         Optional<User> userOptional = userRepo.findByUsername(username);
         List<Tender> responseDtoList = new ArrayList<>();
         if (userOptional.isPresent()) {
-            Optional<List<Tender>> responseDtoListOptional = tenderRepo.findTendersByCreator(userOptional.get());
+            Optional<List<Tender>> responseDtoListOptional = tenderRepo.findTendersByCreator(userOptional.get(), pageable);
             if (responseDtoListOptional.isPresent()) responseDtoList = responseDtoListOptional.get();
         } else {
             throw new UserNotFoundException();

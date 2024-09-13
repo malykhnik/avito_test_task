@@ -48,6 +48,9 @@ public class BidController {
                                               @RequestParam(defaultValue = "0",required = false) int offset,
                                               @RequestParam String username) {
         if (username == null || username.isEmpty()) return ResponseEntity.status(400).body(null);
+        if (limit <= 0 || offset < 0) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("limit or offset less then 0"));
+        }
         try {
             List<BidResponseDto> bidResponseDtos = bidService.getBidsByUser(username);
             return ResponseEntity.ok(bidResponseDtos);
@@ -62,6 +65,9 @@ public class BidController {
                                              @RequestParam(defaultValue = "5",required = false) int limit,
                                              @RequestParam(defaultValue = "0",required = false) int offset) {
         if (username == null || username.isEmpty() || tenderId == null) return ResponseEntity.status(400).body(null);
+        if (limit <= 0 || offset < 0) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("limit or offset less then 0"));
+        }
         try {
             return ResponseEntity.ok(bidService.getBidsByTender(tenderId, username));
         } catch (UserNotFoundException e) {
@@ -188,6 +194,9 @@ public class BidController {
                                         @RequestParam String requesterUsername,
                                         @RequestParam(defaultValue = "5",required = false) int limit,
                                         @RequestParam(defaultValue = "0",required = false) int offset) {
+        if (limit <= 0 || offset < 0) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("limit or offset less then 0"));
+        }
         if (tenderId == null || authorUsername == null || authorUsername.isEmpty()
                 || requesterUsername == null || requesterUsername.isEmpty()) {
             return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));
