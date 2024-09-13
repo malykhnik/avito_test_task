@@ -52,8 +52,7 @@ public class BidController {
             return ResponseEntity.status(400).body(ErrorDto.builder().reason("limit or offset less then 0"));
         }
         try {
-            List<BidResponseDto> bidResponseDtos = bidService.getBidsByUser(username);
-            return ResponseEntity.ok(bidResponseDtos);
+            return ResponseEntity.ok(bidService.getBidsByUser(username, limit, offset));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
         }
@@ -69,7 +68,7 @@ public class BidController {
             return ResponseEntity.status(400).body(ErrorDto.builder().reason("limit or offset less then 0"));
         }
         try {
-            return ResponseEntity.ok(bidService.getBidsByTender(tenderId, username));
+            return ResponseEntity.ok(bidService.getBidsByTender(tenderId, username, limit, offset));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
         } catch (NotFoundUserRightsException e) {
@@ -202,7 +201,7 @@ public class BidController {
             return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));
         }
         try {
-            return ResponseEntity.ok(bidService.getAllReviews(tenderId, authorUsername, requesterUsername));
+            return ResponseEntity.ok(bidService.getAllReviews(tenderId, authorUsername, requesterUsername, limit, offset));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
         } catch (NotFoundUserRightsException e) {

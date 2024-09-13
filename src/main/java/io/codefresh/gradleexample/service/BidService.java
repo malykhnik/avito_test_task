@@ -14,8 +14,8 @@ import java.util.UUID;
 
 public interface BidService {
     BidResponseDto saveBid(BidRequestDto bidRequestDto);
-    List<BidResponseDto> getBidsByUser(String username);
-    List<BidResponseDto> getBidsByTender(UUID tenderId, String username);
+    List<BidResponseDto> getBidsByUser(String username, int limit, int offset);
+    List<BidResponseDto> getBidsByTender(UUID tenderId, String username, int limit, int offset);
     Status getBidStatusByIdAndUser(UUID bidId, String username);
 
     BidResponseDto changeStatusOfBid(UUID bidId, Status status, String username);
@@ -23,5 +23,5 @@ public interface BidService {
     BidResponseDto editBid(Bid bid, BidEditDto bidEditDto);
     BidResponseDto rollbackVersion(UUID bidId, Long version, String username);
     Bid getBidByIdAndUsernameAndVersion(UUID id, String username, Long version);
-    List<FeedbackResponseDto> getAllReviews(UUID tenderId, String authorUsername, String requesterUsername);
+    List<FeedbackResponseDto> getAllReviews(UUID tenderId, String authorUsername, String requesterUsername, int limit, int offset);
 }

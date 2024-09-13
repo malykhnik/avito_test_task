@@ -15,6 +15,9 @@ import io.codefresh.gradleexample.service.BidService;
 import io.codefresh.gradleexample.utils.Helper;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -66,11 +69,13 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public List<BidResponseDto> getBidsByUser(String username) {
+    public List<BidResponseDto> getBidsByUser(String username, int limit, int offset) {
+        Pageable pageable = PageRequest.of(offset, limit, Sort.by("name").ascending());
+
         Optional<User> userOptional = userRepo.findByUsername(username);
         List<Bid> responseDtoList = new ArrayList<>();
         if (userOptional.isPresent()) {
-            Optional<List<Bid>> responseDtoListOptional = bidRepo.findBidsByCreator(userOptional.get());
+            Optional<List<Bid>> responseDtoListOptional = bidRepo.findBidsByCreator(userOptional.get(), pageable);
             if (responseDtoListOptional.isPresent()) responseDtoList = responseDtoListOptional.get();
         } else {
             throw new UserNotFoundException();
@@ -79,13 +84,15 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public List<BidResponseDto> getBidsByTender(UUID tenderId, String username) {
+    public List<BidResponseDto> getBidsByTender(UUID tenderId, String username, int limit, int offset) {
+        Pageable pageable = PageRequest.of(offset, limit, Sort.by("name").ascending());
+
         Optional<User> userOptional = userRepo.findByUsername(username);
         Optional<Tender> tenderOptional = tenderRepo.findById(tenderId);
 
         if (userOptional.isPresent()) {
             if (tenderOptional.isPresent()) {
-                Optional<List<Bid>> bidsListOptional = bidRepo.findBidsByTenderAndCreator(tenderOptional.get(), userOptional.get());
+                Optional<List<Bid>> bidsListOptional = bidRepo.findBidsByTenderAndCreator(tenderOptional.get(), userOptional.get(), pageable);
                 if (bidsListOptional.isPresent()) {
                     return BidMapper.toDtoList(bidsListOptional.get());
                 }
@@ -245,7 +252,9 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public List<FeedbackResponseDto> getAllReviews(UUID tenderId, String authorUsername, String requesterUsername) {
+    public List<FeedbackResponseDto> getAllReviews(UUID tenderId, String authorUsername, String requesterUsername, int limit, int offset) {
+        Pageable pageable = PageRequest.of(offset, limit);
+
         Optional<User> userOptional = userRepo.findByUsername(requesterUsername);
         if (userOptional.isPresent()) {
             User requesterUser = userOptional.get();
@@ -255,7 +264,7 @@ public class BidServiceImpl implements BidService {
                 Optional<User> authorOptional = userRepo.findByUsername(authorUsername);
                 if (authorOptional.isPresent()) {
                     User authorUser = userOptional.get();
-                    Optional<List<Bid>> bidOptional = bidRepo.findBidsByTenderAndCreator(tender, authorUser);
+                    Optional<List<Bid>> bidOptional = bidRepo.findBidsByTenderAndCreator(tender, authorUser, pageable);
                     if (bidOptional.isPresent()) {
                         Optional<List<Feedback>> feedbackListOptional = feedbackRepo.findByUser(authorUser);
                         if (feedbackListOptional.isPresent()) {
