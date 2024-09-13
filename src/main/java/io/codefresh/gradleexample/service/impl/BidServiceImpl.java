@@ -212,4 +212,38 @@ public class BidServiceImpl implements BidService {
         }
         throw new UserNotFoundException();
     }
+
+    @Override
+    public Bid getBidByIdAndUsernameAndVersion(UUID id, String username, Long version) {
+        Optional<User> userOptional = userRepo.findByUsername(username);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            Optional<Bid> bidOptional = bidRepo.findBidByIdAndCreatorAndVersion(id, user, version);
+            if (bidOptional.isPresent()) {
+                return bidOptional.get();
+            }
+            throw new BidNotFoundException();
+        }
+        throw new UserNotFoundException();
+    }
+
+    @Override
+    public BidResponseDto rollbackVersion(UUID bidId, Long version, String username) {
+        //обработка исключений уже произошла в методе getBidByIdAndUsername
+        Bid bid = getBidByIdAndUsername(bidId, username);
+        Bid bidVersion = getBidByIdAndUsernameAndVersion(bidId, username, version);
+
+        bid.setName(bidVersion.getName());
+        bid.setDescription(bidVersion.getDescription());
+        bid.setStatus(bidVersion.getStatus());
+        bid.setAuthorType(bidVersion.getAuthorType());
+        bid.setVersion(bidVersion.getVersion() + 1);
+        bid.setTender(bidVersion.getTender());
+        bid.setOrganization(bidVersion.getOrganization());
+        bid.setCreator(bidVersion.getCreator());
+
+        bidRepo.save(bid);
+
+        return BidMapper.toDto(bid);
+    }
 }

@@ -193,6 +193,7 @@ public class TenderServiceImpl implements TenderService {
 
     @Override
     public TenderResponseDto rollbackToVersion(UUID id, String username, Long version) {
+        //обработка исключений уже произошла в методе getTenderByIdAndUsername
         Tender tender = getTenderByIdAndUsername(id, username);
         Tender tenderVersion = getTenderByIdAndUsernameAndVersion(id, username, version);
 

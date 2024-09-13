@@ -11,6 +11,7 @@ import io.codefresh.gradleexample.enumerate.Status;
 import io.codefresh.gradleexample.exception.*;
 import io.codefresh.gradleexample.service.BidService;
 import io.codefresh.gradleexample.service.DecisionService;
+import io.codefresh.gradleexample.service.FeedbackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class BidController {
     private final BidService bidService;
     private final DecisionService decisionService;
+    private final FeedbackService feedbackService;
 
     @PostMapping("/new")
     public ResponseEntity<?> createBid(@Valid @RequestBody BidRequestDto bidRequestDto) {
@@ -115,7 +117,7 @@ public class BidController {
             return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
         } catch (NotFoundUserRightsException e) {
             return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
-        } catch (TenderNotFoundException e) {
+        } catch (BidNotFoundException e) {
             return ResponseEntity.status(404).body(ErrorDto.builder().reason("Bid not found"));
         }
     }
@@ -133,10 +135,48 @@ public class BidController {
             return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
         } catch (NotFoundUserRightsException e) {
             return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
-        } catch (TenderNotFoundException e) {
+        } catch (BidNotFoundException e) {
             return ResponseEntity.status(404).body(ErrorDto.builder().reason("Bid not found"));
         } catch (OrganizationNotFoundException e) {
             return ResponseEntity.status(404).body(ErrorDto.builder().reason("Organization not found"));
         }
     }
+
+    @PutMapping("/{bidId}/feedback")
+    public ResponseEntity<?> bidFeedback(@PathVariable UUID bidId,
+                                         @RequestParam String bidFeedback,
+                                         @RequestParam String username) {
+        if (bidId == null || username == null || username.isEmpty() || bidFeedback == null || bidFeedback.isEmpty()) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));
+        }
+        try {
+            return ResponseEntity.ok(feedbackService.submitBidFeedback(bidId, bidFeedback, username));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
+        } catch (NotFoundUserRightsException e) {
+            return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
+        } catch (BidNotFoundException e) {
+            return ResponseEntity.status(404).body(ErrorDto.builder().reason("Bid not found"));
+        }
+    }
+
+    @PutMapping("/{bidId}/rollback/{version}")
+    public ResponseEntity<?> rollbackVersion(@PathVariable UUID bidId,
+                                             @PathVariable Long version,
+                                             @RequestParam String username) {
+        if (bidId == null || username == null || username.isEmpty() || version == null) {
+            return ResponseEntity.status(400).body(ErrorDto.builder().reason("One or more parametr is empty"));
+        }
+        try {
+            return ResponseEntity.ok(bidService.rollbackVersion(bidId, version, username));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(401).body(ErrorDto.builder().reason("User not found"));
+        } catch (NotFoundUserRightsException e) {
+            return ResponseEntity.status(403).body(ErrorDto.builder().reason("The user is not responsible with the organization"));
+        } catch (BidNotFoundException e) {
+            return ResponseEntity.status(404).body(ErrorDto.builder().reason("Bid or version not found"));
+        }
+    }
+
+
 }
